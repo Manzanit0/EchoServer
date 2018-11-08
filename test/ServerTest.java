@@ -17,12 +17,12 @@ public class ServerTest {
     public void setup() throws IOException {
         ServerSocket serverSocket = new ServerSocketMock(4200);
         output = new ByteArrayOutputStream();
-        server = new Server(serverSocket, new PrintStream(output));
+        PrintStream ps = new PrintStream(output);
+        server = new Server(serverSocket, new ConsoleIO(ps));
     }
 
     @Test
     public void opensSocketOnSpecifiedPort() {
-        assertEquals(true, server.isListening());
         assertEquals(4200, server.getPort());
     }
 
@@ -39,7 +39,8 @@ public class ServerTest {
         Socket clientSocket = new SocketMock(clientInput, clientOutput);
 
         ServerSocket serverSocket = new ServerSocketMock(clientSocket);
-        server = new Server(serverSocket, new PrintStream(output));
+        PrintStream ps = new PrintStream(output);
+        server = new Server(serverSocket, new ConsoleIO(ps));
 
         server.start();
 
