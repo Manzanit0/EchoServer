@@ -10,6 +10,7 @@ public class Server {
     private Socket clientSocket;
 
     private PrintStream out;
+    private BufferedReader socketReader;
 
     public Server(ServerSocket socket, PrintStream out) {
         this.socket = socket;
@@ -17,8 +18,17 @@ public class Server {
     }
 
     public void start() throws IOException {
+        out.println("Server is running on port: " + getPort());
+
         clientSocket = socket.accept();
         publishNewClientConnection();
+
+        socketReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
+        String message;
+        while((message = getClientMessage()) != null) {
+            out.println(message);
+        }
     }
 
     public boolean isListening() {
@@ -34,7 +44,6 @@ public class Server {
     }
 
     public String getClientMessage() throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        return br.readLine();
+        return socketReader.readLine();
     }
 }

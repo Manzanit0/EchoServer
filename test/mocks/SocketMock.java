@@ -4,16 +4,16 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.Socket;
 
-public class MockSocket extends Socket {
+public class SocketMock extends Socket {
     private final ByteArrayOutputStream output;
     private final ByteArrayInputStream input;
 
-    public MockSocket() {
+    public SocketMock() {
         output = new ByteArrayOutputStream();
         input = new ByteArrayInputStream("mock value".getBytes());
     }
 
-    public MockSocket(ByteArrayInputStream input, ByteArrayOutputStream output) {
+    public SocketMock(ByteArrayInputStream input, ByteArrayOutputStream output) {
         this.output = output;
         this.input = input;
     }

@@ -1,5 +1,5 @@
-import mocks.MockServerSocket;
-import mocks.MockSocket;
+import mocks.ServerSocketMock;
+import mocks.SocketMock;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,7 +15,7 @@ public class ServerTest {
 
     @Before
     public void setup() throws IOException {
-        ServerSocket serverSocket = new MockServerSocket(4200);
+        ServerSocket serverSocket = new ServerSocketMock(4200);
         output = new ByteArrayOutputStream();
         server = new Server(serverSocket, new PrintStream(output));
     }
@@ -33,17 +33,16 @@ public class ServerTest {
     }
 
     @Test
-    public void receivesMessagesFromClient() throws IOException {
+    public void printsMessagesWhileConnexionIsOpen() throws IOException {
         ByteArrayOutputStream clientOutput = new ByteArrayOutputStream();
-        ByteArrayInputStream clientInput = new ByteArrayInputStream("Hello world!".getBytes());
-        Socket clientSocket = new MockSocket(clientInput, clientOutput);
+        ByteArrayInputStream clientInput = new ByteArrayInputStream("One\nTwo\nThree".getBytes());
+        Socket clientSocket = new SocketMock(clientInput, clientOutput);
 
-        ServerSocket serverSocket = new MockServerSocket(clientSocket);
+        ServerSocket serverSocket = new ServerSocketMock(clientSocket);
         server = new Server(serverSocket, new PrintStream(output));
 
         server.start();
 
-        assertEquals("Hello world!", server.getClientMessage());
+        assert(output.toString().contains("One\nTwo\nThree"));
     }
-
 }
