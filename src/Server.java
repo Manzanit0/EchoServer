@@ -1,9 +1,13 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 
 public class Server {
     private ServerSocket socket;
+    private Socket clientSocket;
 
     private PrintStream out;
 
@@ -13,7 +17,7 @@ public class Server {
     }
 
     public void start() throws IOException {
-        socket.accept();
+        clientSocket = socket.accept();
         publishNewClientConnection();
     }
 
@@ -27,5 +31,10 @@ public class Server {
 
     public void publishNewClientConnection() {
         out.println("A new client has connected.");
+    }
+
+    public String getClientMessage() throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        return br.readLine();
     }
 }

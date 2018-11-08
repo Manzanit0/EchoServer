@@ -1,32 +1,49 @@
 import mocks.MockServerSocket;
+import mocks.MockSocket;
+import org.junit.Before;
 import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.ServerSocket;
+import java.net.Socket;
 
 import static org.junit.Assert.assertEquals;
 
 public class ServerTest {
-    @Test
-    public void opensSocketOnSpecifiedPort() throws IOException {
+    private ByteArrayOutputStream output;
+    private Server server;
+
+    @Before
+    public void setup() throws IOException {
         ServerSocket serverSocket = new MockServerSocket(4200);
-        Server server = new Server(serverSocket, new PrintStream(new ByteArrayOutputStream()));
+        output = new ByteArrayOutputStream();
+        server = new Server(serverSocket, new PrintStream(output));
+    }
 
-
+    @Test
+    public void opensSocketOnSpecifiedPort() {
         assertEquals(true, server.isListening());
         assertEquals(4200, server.getPort());
     }
 
     @Test
     public void informsOfNewClientConnection() throws IOException {
-        ServerSocket serverSocket = new MockServerSocket(4200);
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        Server server = new Server(serverSocket, new PrintStream(output));
+        server.start();
+        assert(output.toString().contains("A new client has connected."));
+    }
+
+    @Test
+    public void receivesMessagesFromClient() throws IOException {
+        ByteArrayOutputStream clientOutput = new ByteArrayOutputStream();
+        ByteArrayInputStream clientInput = new ByteArrayInputStream("Hello world!".getBytes());
+        Socket clientSocket = new MockSocket(clientInput, clientOutput);
+
+        ServerSocket serverSocket = new MockServerSocket(clientSocket);
+        server = new Server(serverSocket, new PrintStream(output));
 
         server.start();
 
-        assert(output.toString().contains("A new client has connected."));
+        assertEquals("Hello world!", server.getClientMessage());
     }
+
 }
