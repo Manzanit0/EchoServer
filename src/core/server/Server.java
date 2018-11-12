@@ -1,11 +1,14 @@
+package core.server;
+
+import core.common.ConsoleIO;
+import core.common.SocketIO;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
     private ServerSocket socket;
-    private Socket clientSocket;
-
     private ConsoleIO out;
     private SocketIO socketIO;
 
@@ -15,15 +18,16 @@ public class Server {
     }
 
     public void start() throws IOException {
-        out.write("Server is running on port: " + getPort());
+        out.write("core.server.core.server is running on port: " + getPort());
 
-        clientSocket = socket.accept();
+        Socket clientSocket = socket.accept();
         socketIO = new SocketIO(clientSocket);
         publishNewClientConnection();
 
         String message;
         while((message = getClientMessage()) != null) {
             out.write(message);
+            socketIO.write(message);
         }
     }
 

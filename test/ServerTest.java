@@ -1,3 +1,5 @@
+import core.common.ConsoleIO;
+import core.server.Server;
 import mocks.ServerSocketMock;
 import mocks.SocketMock;
 import org.junit.Before;
@@ -18,7 +20,7 @@ public class ServerTest {
         ServerSocket serverSocket = new ServerSocketMock(4200);
         output = new ByteArrayOutputStream();
         PrintStream ps = new PrintStream(output);
-        server = new Server(serverSocket, new ConsoleIO(ps));
+        server = new Server(serverSocket, new ConsoleIO(ps, System.in));
     }
 
     @Test
@@ -40,7 +42,7 @@ public class ServerTest {
 
         ServerSocket serverSocket = new ServerSocketMock(clientSocket);
         PrintStream ps = new PrintStream(output);
-        server = new Server(serverSocket, new ConsoleIO(ps));
+        server = new Server(serverSocket, new ConsoleIO(ps, System.in));
 
         server.start();
 
