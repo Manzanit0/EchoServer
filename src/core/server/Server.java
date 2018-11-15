@@ -1,27 +1,27 @@
 package core.server;
 
-import core.common.ConsoleIO;
-import core.common.SocketIO;
+import core.io.IOHandler;
+import core.io.SocketIOHandler;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
-    private ServerSocket socket;
-    private ConsoleIO out;
-    private SocketIO socketIO;
+    private ServerSocket serverSocket;
+    private IOHandler out;
+    private SocketIOHandler socketIO;
 
-    public Server(ServerSocket socket, ConsoleIO out) {
-        this.socket = socket;
+    public Server(ServerSocket serverSocket, IOHandler out) {
+        this.serverSocket = serverSocket;
         this.out = out;
     }
 
     public void start() throws IOException {
-        out.write("core.server.core.server is running on port: " + getPort());
+        out.write("server is running on port: " + getPort());
 
-        Socket clientSocket = socket.accept();
-        socketIO = new SocketIO(clientSocket);
+        Socket socket = serverSocket.accept();
+        socketIO = new SocketIOHandler(socket);
         publishNewClientConnection();
 
         String message;
@@ -32,7 +32,7 @@ public class Server {
     }
 
     public int getPort() {
-        return socket.getLocalPort();
+        return serverSocket.getLocalPort();
     }
 
     public void publishNewClientConnection() {

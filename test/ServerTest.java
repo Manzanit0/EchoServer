@@ -1,7 +1,7 @@
-import core.common.ConsoleIO;
 import core.server.Server;
 import mocks.ServerSocketMock;
 import mocks.SocketMock;
+import mocks.StandardIOHandlerMock;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,8 +19,7 @@ public class ServerTest {
     public void setup() throws IOException {
         ServerSocket serverSocket = new ServerSocketMock(4200);
         output = new ByteArrayOutputStream();
-        PrintStream ps = new PrintStream(output);
-        server = new Server(serverSocket, new ConsoleIO(ps, System.in));
+        server = new Server(serverSocket, StandardIOHandlerMock.createMock("Some input", output));
     }
 
     @Test
@@ -42,7 +41,7 @@ public class ServerTest {
 
         ServerSocket serverSocket = new ServerSocketMock(clientSocket);
         PrintStream ps = new PrintStream(output);
-        server = new Server(serverSocket, new ConsoleIO(ps, System.in));
+        server = new Server(serverSocket, StandardIOHandlerMock.createMock("Some input", output));
 
         server.start();
 

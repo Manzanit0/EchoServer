@@ -1,26 +1,26 @@
 package core.client;
 
-import core.common.ConsoleIO;
-import core.common.SocketIO;
+import core.io.IOHandler;
+import core.io.SocketIOHandler;
 
 import java.io.IOException;
 import java.net.Socket;
 
 public class Client {
-    private final SocketIO socketIO;
-    private final ConsoleIO consoleIO;
+    private final SocketIOHandler socketIoHandler;
+    private final IOHandler ioHandler;
 
-    public Client(Socket clientSocket, ConsoleIO consoleIO) throws IOException {
-        this.consoleIO = consoleIO;
-        socketIO = new SocketIO(clientSocket);
+    public Client(Socket clientSocket, IOHandler ioHandler) throws IOException {
+        this.ioHandler = ioHandler;
+        socketIoHandler = new SocketIOHandler(clientSocket);
     }
 
     public void start() throws IOException {
         String input;
-        while ((input = consoleIO.read()) != null) {
-            socketIO.write(input);
-            String response = socketIO.read();
-            consoleIO.write(response);
+        while ((input = ioHandler.read()) != null) {
+            socketIoHandler.write(input);
+            String response = socketIoHandler.read();
+            ioHandler.write(response);
         }
     }
 }
