@@ -9,45 +9,45 @@ import java.net.Socket;
 
 public class Server {
     private ServerSocket serverSocket;
-    private IOHandler serverConsoleIO;
+    private IOHandler consoleIOHandler;
     private SocketIOHandler socketIO;
 
-    public Server(ServerSocket serverSocket, IOHandler serverConsoleIO) {
+    public Server(ServerSocket serverSocket, IOHandler consoleIOHandler) {
         this.serverSocket = serverSocket;
-        this.serverConsoleIO = serverConsoleIO;
+        this.consoleIOHandler = consoleIOHandler;
     }
 
     public void start() throws IOException {
-        publishMessage("server is running on port: " + getPort(), serverConsoleIO);
+        writeMessage("server is running on port: " + getPort(), consoleIOHandler);
 
-        acceptIncomingConnection();
-        publishMessage("A new client has connected.", serverConsoleIO);
+        acceptConnection();
+        writeMessage("A new client has connected.", consoleIOHandler);
 
-        receiveClientMessages();
+        handleMessages();
     }
 
-    private void acceptIncomingConnection() throws IOException {
+    private void acceptConnection() throws IOException {
         Socket socket = serverSocket.accept();
         socketIO = new SocketIOHandler(socket);
     }
 
-    private void receiveClientMessages() throws IOException {
+    private void handleMessages() throws IOException {
         String message;
-        while((message = getClientMessage()) != null) {
-            publishMessage(message, serverConsoleIO);
-            publishMessage(message, socketIO);
+        while((message = readNextMessage()) != null) {
+            writeMessage(message, consoleIOHandler);
+            writeMessage(message, socketIO);
         }
     }
 
-    private void publishMessage(String message, IOHandler out) {
+    public String readNextMessage() throws IOException {
+        return socketIO.read();
+    }
+
+    private void writeMessage(String message, IOHandler out) {
         out.write(message);
     }
 
     public int getPort() {
         return serverSocket.getLocalPort();
-    }
-
-    public String getClientMessage() throws IOException {
-        return socketIO.read();
     }
 }
