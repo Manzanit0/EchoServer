@@ -5,46 +5,65 @@ import mocks.StandardIOHandlerMock;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
 
-import static org.junit.Assert.assertEquals;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ServerTest {
-    private ByteArrayOutputStream output;
+    private ByteArrayOutputStream serverConsoleOutput;
     private Server server;
 
     @Before
     public void setup() throws IOException {
-        ServerSocket serverSocket = new ServerSocketMock(4200);
-        output = new ByteArrayOutputStream();
-        server = new Server(serverSocket, StandardIOHandlerMock.createMock("Some input", output));
+        ServerSocketMock serverSocket = new ServerSocketMock(4200);
+        serverSocket.setSocket(new SocketMock()); // Socket to be returned after a connection is accepted.
+
+        serverConsoleOutput = new ByteArrayOutputStream();
+        StandardIOHandlerMock serverIoHandler = StandardIOHandlerMock.createMock(serverConsoleOutput);
+
+        server = new Server(serverSocket, serverIoHandler);
     }
 
     @Test
-    public void opensSocketOnSpecifiedPort() {
-        assertEquals(4200, server.getPort());
+    public void acceptsIncomingConnection() throws IOException {
+        server.start();
+
+        assertNotNull(server.getConnectionSocket());
     }
 
     @Test
     public void informsOfNewClientConnection() throws IOException {
         server.start();
-        assert(output.toString().contains("A new client has connected."));
+
+        assertTrue(serverConsoleOutput.toString().contains("A new client has connected."));
     }
 
     @Test
     public void printsMessagesWhileConnexionIsOpen() throws IOException {
-        ByteArrayOutputStream clientOutput = new ByteArrayOutputStream();
-        ByteArrayInputStream clientInput = new ByteArrayInputStream("One\nTwo\nThree".getBytes());
-        Socket clientSocket = new SocketMock(clientInput, clientOutput);
+        SocketMock socket = createSocket("One\nTwo\nThree");
+        ServerSocketMock serverSocket = createServerSocket(socket);
+        StandardIOHandlerMock serverIoHandler = StandardIOHandlerMock.createMock(serverConsoleOutput);
 
-        ServerSocket serverSocket = new ServerSocketMock(clientSocket);
-        PrintStream ps = new PrintStream(output);
-        server = new Server(serverSocket, StandardIOHandlerMock.createMock("Some input", output));
+        server = new Server(serverSocket, serverIoHandler);
 
         server.start();
 
-        assert(output.toString().contains("One\nTwo\nThree"));
+        assertTrue(serverConsoleOutput.toString().contains("One\nTwo\nThree"));
+    }
+
+    private ServerSocketMock createServerSocket(SocketMock socket) throws IOException {
+        ServerSocketMock serverSocket = new ServerSocketMock(4200);
+        serverSocket.setSocket(socket);
+        return serverSocket;
+    }
+
+    private SocketMock createSocket(String socketInput) {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        ByteArrayInputStream input = new ByteArrayInputStream(socketInput.getBytes());
+        return new SocketMock(input, output);
     }
 }

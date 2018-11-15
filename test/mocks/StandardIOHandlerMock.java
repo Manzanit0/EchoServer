@@ -12,8 +12,12 @@ public class StandardIOHandlerMock extends IOHandler {
         super(output, input);
     }
 
-    public static IOHandler createMock(String inputText, ByteArrayOutputStream output) {
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(inputText.getBytes());
+    public static StandardIOHandlerMock createMock(ByteArrayOutputStream output) {
+        return createMock("", output);
+    }
+
+    public static StandardIOHandlerMock createMock(String inputText, ByteArrayOutputStream output) {
+        InputStream inputStream = new ByteArrayInputStream(inputText.getBytes());
         PrintStream printStream = new PrintStream(output);
 
         return new StandardIOHandlerMock(printStream, inputStream);

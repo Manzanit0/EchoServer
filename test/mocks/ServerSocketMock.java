@@ -6,16 +6,14 @@ import java.net.Socket;
 
 public class ServerSocketMock extends ServerSocket {
     private final int portNumber;
-    private final Socket clientSocket;
+    private Socket socket;
 
     public ServerSocketMock(int portNumber) throws IOException {
         this.portNumber = portNumber;
-        clientSocket = new SocketMock();
     }
 
-    public ServerSocketMock(Socket clientSocket) throws IOException {
-        this.clientSocket = clientSocket;
-        portNumber = 5000;
+    public void setSocket(Socket socket) {
+        this.socket = socket;
     }
 
     @Override
@@ -25,6 +23,6 @@ public class ServerSocketMock extends ServerSocket {
 
     @Override
     public Socket accept() {
-        return clientSocket;
+        return socket;
     }
 }

@@ -11,6 +11,7 @@ public class Server {
     private ServerSocket serverSocket;
     private IOHandler consoleIOHandler;
     private SocketIOHandler socketIO;
+    private Socket connectionSocket;
 
     public Server(ServerSocket serverSocket, IOHandler consoleIOHandler) {
         this.serverSocket = serverSocket;
@@ -27,8 +28,8 @@ public class Server {
     }
 
     private void acceptConnection() throws IOException {
-        Socket socket = serverSocket.accept();
-        socketIO = new SocketIOHandler(socket);
+        connectionSocket = serverSocket.accept();
+        socketIO = new SocketIOHandler(connectionSocket);
     }
 
     private void handleMessages() throws IOException {
@@ -49,5 +50,9 @@ public class Server {
 
     public int getPort() {
         return serverSocket.getLocalPort();
+    }
+
+    public Socket getConnectionSocket() {
+        return connectionSocket;
     }
 }
