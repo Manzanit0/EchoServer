@@ -17,10 +17,34 @@ public class Client {
 
     public void start() throws IOException {
         String input;
-        while ((input = ioHandler.read()) != null) {
-            socketIoHandler.write(input);
-            String response = socketIoHandler.read();
-            ioHandler.write(response);
+        while ((input = read()) != null) {
+            handleInput(input);
         }
+    }
+
+    private void handleInput(String input) throws IOException {
+        sendMessage(input);
+        handleServerResponse();
+    }
+
+    private void handleServerResponse() throws IOException {
+        String response = readMessage();
+        write(response);
+    }
+
+    private void write(String response) {
+        ioHandler.write(response);
+    }
+
+    private String read() throws IOException {
+        return ioHandler.read();
+    }
+
+    private void sendMessage(String input) {
+        socketIoHandler.write(input);
+    }
+
+    private String readMessage() throws IOException {
+        return socketIoHandler.read();
     }
 }
