@@ -40,7 +40,7 @@ public class Server {
         }
     }
 
-    public String readNextMessage() throws IOException {
+    private String readNextMessage() throws IOException {
         return socketIO.read();
     }
 
