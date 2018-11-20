@@ -4,15 +4,14 @@ import core.io.IOHandler;
 import core.io.SocketIOHandler;
 
 import java.io.IOException;
-import java.net.Socket;
 
 public class Client {
-    private final SocketIOHandler socketIoHandler;
+    private final SocketIOHandler socketHandler;
     private final IOHandler ioHandler;
 
-    public Client(Socket clientSocket, IOHandler ioHandler) throws IOException {
+    public Client(SocketIOHandler socketHandler, IOHandler ioHandler) {
         this.ioHandler = ioHandler;
-        socketIoHandler = new SocketIOHandler(clientSocket);
+        this.socketHandler = socketHandler;
     }
 
     public void start() throws IOException {
@@ -23,12 +22,8 @@ public class Client {
     }
 
     private void handleInput(String input) throws IOException {
-        sendMessage(input);
-        handleServerResponse();
-    }
-
-    private void handleServerResponse() throws IOException {
-        String response = readMessage();
+        send(input);
+        String response = receive();
         write(response);
     }
 
@@ -40,11 +35,11 @@ public class Client {
         return ioHandler.read();
     }
 
-    private void sendMessage(String input) {
-        socketIoHandler.write(input);
+    private void send(String input) {
+        socketHandler.write(input);
     }
 
-    private String readMessage() throws IOException {
-        return socketIoHandler.read();
+    private String receive() throws IOException {
+        return socketHandler.read();
     }
 }
