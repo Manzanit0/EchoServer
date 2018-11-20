@@ -19,10 +19,10 @@ public class Server {
     }
 
     public void start() throws IOException {
-        writeMessage("server is running on port: " + getPort(), consoleIOHandler);
+        write("server is running on port: " + getPort());
 
         acceptConnection();
-        writeMessage("A new client has connected.", consoleIOHandler);
+        write("A new client has connected.");
 
         handleMessages();
     }
@@ -34,18 +34,22 @@ public class Server {
 
     private void handleMessages() throws IOException {
         String message;
-        while((message = readNextMessage()) != null) {
-            writeMessage(message, consoleIOHandler);
-            writeMessage(message, socketIO);
+        while((message = receive()) != null) {
+            write(message);
+            send(message);
         }
     }
 
-    private String readNextMessage() throws IOException {
-        return socketIO.read();
+    private void write(String message) {
+        consoleIOHandler.write(message);
     }
 
-    private void writeMessage(String message, IOHandler out) {
-        out.write(message);
+    private void send(String message) {
+        socketIO.write(message);
+    }
+
+    private String receive() throws IOException {
+        return socketIO.read();
     }
 
     public int getPort() {
